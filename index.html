@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#f5f7fb">
+  <title>Work &amp; Study To-Do List</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: Inter, "Segoe UI", Arial, sans-serif;
+      color: #182230;
+      background: #f5f7fb;
+      font-synthesis: none;
+    }
+
+    * { box-sizing: border-box; }
+
+    body {
+      min-height: 100vh;
+      margin: 0;
+      padding: 48px 20px;
+      background:
+        radial-gradient(ellipse at 15% 0%, #e4ebff 0, transparent 34rem),
+        #f5f7fb;
+    }
+
+    main {
+      width: min(100%, 680px);
+      margin: 0 auto;
+      padding: 36px;
+      border: 1px solid #e7eaf0;
+      border-radius: 22px;
+      background: #fff;
+      box-shadow: 0 18px 55px rgb(31 45 75 / 9%);
+    }
+
+    .eyebrow {
+      margin: 0 0 8px;
+      color: #5b6bd5;
+      font-size: .78rem;
+      font-weight: 750;
+      letter-spacing: .12em;
+      text-transform: uppercase;
+    }
+
+    h1 {
+      margin: 0;
+      font-size: clamp(1.8rem, 5vw, 2.35rem);
+      letter-spacing: -.04em;
+    }
+
+    .subtitle {
+      margin: 9px 0 26px;
+      color: #697586;
+      line-height: 1.5;
+    }
+
+    .add-form {
+      display: flex;
+      gap: 10px;
+      margin-bottom: 24px;
+    }
+
+    .add-form input {
+      flex: 1;
+      min-width: 0;
+      padding: 13px 15px;
+      border: 1px solid #d9deea;
+      border-radius: 11px;
+      color: inherit;
+      font: inherit;
+    }
+
+    .add-form input:focus {
+      border-color: #6675df;
+      outline: 3px solid rgb(102 117 223 / 18%);
+    }
+
+    button {
+      border: 0;
+      border-radius: 11px;
+      font: inherit;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    .add-button {
+      padding: 0 19px;
+      color: #fff;
+      background: #5969d3;
+    }
+
+    .add-button:hover { background: #4656c1; }
+
+    .progress-wrap {
+      margin-bottom: 28px;
+      padding: 15px 17px;
+      border-radius: 13px;
+      background: #f6f7ff;
+    }
+
+    .progress-copy {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 10px;
+      color: #535f78;
+      font-size: .9rem;
+    }
+
+    .progress-copy strong { color: #3948a7; }
+
+    .progress-track {
+      height: 8px;
+      overflow: hidden;
+      border-radius: 99px;
+      background: #e2e6f7;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      border-radius: inherit;
+      background: linear-gradient(90deg, #6475e5, #8b6fe3);
+      transition: width .2s ease;
+    }
+
+    section + section { margin-top: 27px; }
+
+    h2 {
+      margin: 0 0 11px;
+      color: #727d8d;
+      font-size: .78rem;
+      font-weight: 750;
+      letter-spacing: .1em;
+      text-transform: uppercase;
+    }
+
+    ul {
+      display: grid;
+      gap: 8px;
+      margin: 0;
+      padding: 0;
+      list-style: none;
+    }
+
+    .task {
+      display: flex;
+      align-items: flex-start;
+      gap: 12px;
+      padding: 13px 14px;
+      border: 1px solid #edf0f4;
+      border-radius: 12px;
+      transition: background .15s ease, border-color .15s ease;
+    }
+
+    .task:hover {
+      border-color: #dfe3f2;
+      background: #fcfcff;
+    }
+
+    .task input {
+      width: 18px;
+      height: 18px;
+      flex: 0 0 auto;
+      margin: 1px 0 0;
+      accent-color: #5969d3;
+      cursor: pointer;
+    }
+
+    .task label {
+      flex: 1;
+      line-height: 1.45;
+      cursor: pointer;
+    }
+
+    .task.done label {
+      color: #929baa;
+      text-decoration: line-through;
+    }
+
+    .delete-button {
+      padding: 2px 5px;
+      color: #9aa2ae;
+      background: transparent;
+      font-size: 1.15rem;
+      line-height: 1;
+    }
+
+    .delete-button:hover {
+      color: #c23d52;
+      background: #fff0f2;
+    }
+
+    .footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      margin-top: 25px;
+      padding-top: 17px;
+      border-top: 1px solid #edf0f4;
+      color: #7a8492;
+      font-size: .85rem;
+    }
+
+    .clear-button {
+      padding: 8px 10px;
+      color: #5969d3;
+      background: transparent;
+    }
+
+    .clear-button:hover { background: #f3f4ff; }
+    .empty { color: #929baa; font-size: .9rem; }
+
+    @media (max-width: 520px) {
+      body { padding: 20px 12px; }
+      main { padding: 25px 19px; }
+      .add-button { padding: 0 14px; }
+    }
+  </style>
+</head>
+<body>
+  <main>
+    <p class="eyebrow">A little more focus, every day</p>
+    <h1>Work &amp; Study To-Do List</h1>
+    <p class="subtitle">Plan your day, focus on what matters, and finish with a clear next step.</p>
+
+    <form class="add-form" id="add-form">
+      <label for="new-task" hidden>Add a task</label>
+      <input id="new-task" type="text" placeholder="Add a task..." maxlength="140" autocomplete="off" required>
+      <button class="add-button" type="submit">Add task</button>
+    </form>
+
+    <div class="progress-wrap" aria-live="polite">
+      <div class="progress-copy">
+        <span>Today's progress</span>
+        <strong id="progress-copy">0 of 0 complete</strong>
+      </div>
+      <div class="progress-track" role="progressbar" aria-label="Tasks completed" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0" id="progress-track">
+        <div class="progress-bar" id="progress-bar"></div>
+      </div>
+    </div>
+
+    <div id="task-groups"></div>
+
+    <footer class="footer">
+      <span id="remaining">You’ve got this.</span>
+      <button class="clear-button" id="clear-completed" type="button">Clear completed</button>
+    </footer>
+  </main>
+
+  <script>
+    const STORAGE_KEY = "work-study-todo-v1";
+    const starterTasks = [
+      { id: "plan-1", group: "Plan", text: "Choose the three most important things to complete today", done: false },
+      { id: "plan-2", group: "Plan", text: "Break larger tasks into smaller steps", done: false },
+      { id: "plan-3", group: "Plan", text: "Gather the notes, materials, and tools I need", done: false },
+      { id: "focus-1", group: "Focus", text: "Work on the highest-priority task", done: false },
+      { id: "focus-2", group: "Focus", text: "Take a short break, then continue with the next task", done: false },
+      { id: "focus-3", group: "Focus", text: "Check messages and email at a planned time", done: false },
+      { id: "focus-4", group: "Focus", text: "Review or practice what I learned", done: false },
+      { id: "wrap-1", group: "Wrap up", text: "Finish or note the next step for any task in progress", done: false },
+      { id: "wrap-2", group: "Wrap up", text: "Record what I completed", done: false },
+      { id: "wrap-3", group: "Wrap up", text: "Choose a first task for the next work or study session", done: false }
+    ];
+
+    let tasks = loadTasks();
+    const groupsElement = document.getElementById("task-groups");
+    const form = document.getElementById("add-form");
+    const input = document.getElementById("new-task");
+
+    function loadTasks() {
+      try {
+        const saved = localStorage.getItem(STORAGE_KEY);
+        if (!saved) return starterTasks;
+        const parsed = JSON.parse(saved);
+        if (!Array.isArray(parsed) || parsed.some(task =>
+          typeof task.id !== "string" ||
+          typeof task.group !== "string" ||
+          typeof task.text !== "string" ||
+          typeof task.done !== "boolean"
+        )) {
+          throw new Error("Saved to-do list has an invalid format.");
+        }
+        return parsed;
+      } catch (error) {
+        console.error("Could not load the saved to-do list.", error);
+        return starterTasks;
+      }
+    }
+
+    function saveTasks() {
+      try {
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(tasks));
+      } catch (error) {
+        console.error("Could not save the to-do list.", error);
+        document.getElementById("remaining").textContent = "Changes couldn't be saved in this browser.";
+      }
+    }
+
+    function render() {
+      groupsElement.replaceChildren();
+      const groups = [...new Set([...starterTasks.map(task => task.group), ...tasks.map(task => task.group)])];
+
+      for (const group of groups) {
+        const groupTasks = tasks.filter(task => task.group === group);
+        if (groupTasks.length === 0) continue;
+
+        const section = document.createElement("section");
+        const heading = document.createElement("h2");
+        heading.textContent = group;
+        const list = document.createElement("ul");
+        section.append(heading, list);
+
+        for (const task of groupTasks) {
+          const item = document.createElement("li");
+          item.className = `task${task.done ? " done" : ""}`;
+
+          const checkbox = document.createElement("input");
+          checkbox.type = "checkbox";
+          checkbox.id = `task-${task.id}`;
+          checkbox.checked = task.done;
+          checkbox.setAttribute("aria-label", `Mark "${task.text}" ${task.done ? "incomplete" : "complete"}`);
+          checkbox.addEventListener("change", () => {
+            task.done = checkbox.checked;
+            saveTasks();
+            render();
+          });
+
+          const label = document.createElement("label");
+          label.htmlFor = checkbox.id;
+          label.textContent = task.text;
+
+          const remove = document.createElement("button");
+          remove.type = "button";
+          remove.className = "delete-button";
+          remove.textContent = "×";
+          remove.setAttribute("aria-label", `Delete "${task.text}"`);
+          remove.addEventListener("click", () => {
+            tasks = tasks.filter(current => current.id !== task.id);
+            saveTasks();
+            render();
+          });
+
+          item.append(checkbox, label, remove);
+          list.append(item);
+        }
+
+        groupsElement.append(section);
+      }
+
+      if (tasks.length === 0) {
+        const empty = document.createElement("p");
+        empty.className = "empty";
+        empty.textContent = "No tasks yet. Add one above to get started.";
+        groupsElement.append(empty);
+      }
+
+      const completed = tasks.filter(task => task.done).length;
+      const total = tasks.length;
+      const percentage = total === 0 ? 0 : Math.round((completed / total) * 100);
+      document.getElementById("progress-copy").textContent = `${completed} of ${total} complete`;
+      document.getElementById("progress-bar").style.width = `${percentage}%`;
+      const progressTrack = document.getElementById("progress-track");
+      progressTrack.setAttribute("aria-valuenow", String(percentage));
+      const remaining = total - completed;
+      document.getElementById("remaining").textContent = remaining === 0 && total > 0
+        ? "All done. Great work!"
+        : `${remaining} ${remaining === 1 ? "task" : "tasks"} left`;
+    }
+
+    form.addEventListener("submit", event => {
+      event.preventDefault();
+      const text = input.value.trim();
+      if (!text) return;
+      tasks.push({
+        id: `task-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        group: "My tasks",
+        text,
+        done: false
+      });
+      saveTasks();
+      input.value = "";
+      render();
+      input.focus();
+    });
+
+    document.getElementById("clear-completed").addEventListener("click", () => {
+      tasks = tasks.filter(task => !task.done);
+      saveTasks();
+      render();
+    });
+
+    render();
+  </script>
+</body>
+</html>
