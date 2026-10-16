@@ -36,6 +36,34 @@
       animation: panel-enter .55s cubic-bezier(.2, .75, .25, 1) both;
     }
 
+    .section-nav {
+      display: flex;
+      gap: 6px;
+      overflow-x: auto;
+      margin: -8px 0 27px;
+      padding: 6px;
+      border-radius: 13px;
+      background: #f6f7ff;
+      scrollbar-width: thin;
+    }
+
+    .section-nav a {
+      flex: 0 0 auto;
+      padding: 9px 12px;
+      border-radius: 9px;
+      color: #535f78;
+      font-size: .88rem;
+      font-weight: 650;
+      text-decoration: none;
+      transition: color .15s ease, background .15s ease;
+    }
+
+    .section-nav a:hover,
+    .section-nav a:focus-visible {
+      color: #3948a7;
+      background: #fff;
+    }
+
     @keyframes panel-enter {
       from { opacity: 0; transform: translateY(16px); }
       to { opacity: 1; transform: translateY(0); }
@@ -271,7 +299,8 @@
   </style>
 </head>
 <body>
-  <main>
+  <main id="overview">
+    <nav class="section-nav" id="section-nav" aria-label="Task sections"></nav>
     <p class="eyebrow">A little more focus, every day</p>
     <h1>Work &amp; Study To-Do List</h1>
     <p class="subtitle">Plan your day, focus on what matters, and finish with a clear next step.</p>
@@ -317,6 +346,7 @@
 
     let tasks = loadTasks();
     const groupsElement = document.getElementById("task-groups");
+    const sectionNav = document.getElementById("section-nav");
     const form = document.getElementById("add-form");
     const input = document.getElementById("new-task");
 
@@ -351,18 +381,30 @@
 
     function render(animateTaskId = null, animateInitialTasks = false, completedTaskId = null) {
       groupsElement.replaceChildren();
+      sectionNav.replaceChildren();
+      const overviewLink = document.createElement("a");
+      overviewLink.href = "#overview";
+      overviewLink.textContent = "Today";
+      sectionNav.append(overviewLink);
+
       const groups = [...new Set([...starterTasks.map(task => task.group), ...tasks.map(task => task.group)])];
 
       let taskIndex = 0;
-      for (const group of groups) {
+      for (const [groupIndex, group] of groups.entries()) {
         const groupTasks = tasks.filter(task => task.group === group);
         if (groupTasks.length === 0) continue;
 
         const section = document.createElement("section");
+        section.id = `task-group-${groupIndex}`;
         const heading = document.createElement("h2");
         heading.textContent = group;
         const list = document.createElement("ul");
         section.append(heading, list);
+
+        const groupLink = document.createElement("a");
+        groupLink.href = `#${section.id}`;
+        groupLink.textContent = group;
+        sectionNav.append(groupLink);
 
         for (const task of groupTasks) {
           const item = document.createElement("li");
