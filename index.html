@@ -33,6 +33,21 @@
       border-radius: 22px;
       background: #fff;
       box-shadow: 0 18px 55px rgb(31 45 75 / 9%);
+      animation: panel-enter .55s cubic-bezier(.2, .75, .25, 1) both;
+    }
+
+    @keyframes panel-enter {
+      from { opacity: 0; transform: translateY(16px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes task-enter {
+      from { opacity: 0; transform: translateY(8px) scale(.99); }
+      to { opacity: 1; transform: translateY(0) scale(1); }
+    }
+
+    @keyframes task-complete {
+      50% { transform: scale(1.015); }
     }
 
     .eyebrow {
@@ -89,9 +104,16 @@
       padding: 0 19px;
       color: #fff;
       background: #5969d3;
+      transition: background .15s ease, transform .15s ease, box-shadow .15s ease;
     }
 
-    .add-button:hover { background: #4656c1; }
+    .add-button:hover {
+      background: #4656c1;
+      box-shadow: 0 4px 10px rgb(70 86 193 / 20%);
+      transform: translateY(-1px);
+    }
+
+    .add-button:active { transform: translateY(0) scale(.98); }
 
     .progress-wrap {
       margin-bottom: 28px;
@@ -123,7 +145,7 @@
       height: 100%;
       border-radius: inherit;
       background: linear-gradient(90deg, #6475e5, #8b6fe3);
-      transition: width .2s ease;
+      transition: width .45s cubic-bezier(.2, .75, .25, 1);
     }
 
     section + section { margin-top: 27px; }
@@ -152,12 +174,21 @@
       padding: 13px 14px;
       border: 1px solid #edf0f4;
       border-radius: 12px;
-      transition: background .15s ease, border-color .15s ease;
+      transition: background .15s ease, border-color .15s ease, transform .15s ease;
     }
 
     .task:hover {
       border-color: #dfe3f2;
       background: #fcfcff;
+      transform: translateY(-1px);
+    }
+
+    .task.is-entering {
+      animation: task-enter .35s cubic-bezier(.2, .75, .25, 1) both;
+    }
+
+    .task.is-completing {
+      animation: task-complete .3s ease;
     }
 
     .task input {
@@ -186,11 +217,13 @@
       background: transparent;
       font-size: 1.15rem;
       line-height: 1;
+      transition: color .15s ease, background .15s ease, transform .15s ease;
     }
 
     .delete-button:hover {
       color: #c23d52;
       background: #fff0f2;
+      transform: scale(1.08);
     }
 
     .footer {
@@ -211,8 +244,24 @@
       background: transparent;
     }
 
-    .clear-button:hover { background: #f3f4ff; }
+    .clear-button {
+      transition: background .15s ease, transform .15s ease;
+    }
+
+    .clear-button:hover {
+      background: #f3f4ff;
+      transform: translateY(-1px);
+    }
     .empty { color: #929baa; font-size: .9rem; }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after {
+        scroll-behavior: auto !important;
+        animation-duration: .01ms !important;
+        animation-iteration-count: 1 !important;
+        transition-duration: .01ms !important;
+      }
+    }
 
     @media (max-width: 520px) {
       body { padding: 20px 12px; }
@@ -300,10 +349,11 @@
       }
     }
 
-    function render() {
+    function render(animateTaskId = null, animateInitialTasks = false, completedTaskId = null) {
       groupsElement.replaceChildren();
       const groups = [...new Set([...starterTasks.map(task => task.group), ...tasks.map(task => task.group)])];
 
+      let taskIndex = 0;
       for (const group of groups) {
         const groupTasks = tasks.filter(task => task.group === group);
         if (groupTasks.length === 0) continue;
@@ -317,6 +367,15 @@
         for (const task of groupTasks) {
           const item = document.createElement("li");
           item.className = `task${task.done ? " done" : ""}`;
+          if (animateInitialTasks || task.id === animateTaskId) {
+            item.classList.add("is-entering");
+            item.style.animationDelay = animateInitialTasks
+              ? `${Math.min(taskIndex, 10) * 35}ms`
+              : "0ms";
+          } else if (task.id === completedTaskId) {
+            item.classList.add("is-completing");
+          }
+          taskIndex++;
 
           const checkbox = document.createElement("input");
           checkbox.type = "checkbox";
@@ -326,7 +385,7 @@
           checkbox.addEventListener("change", () => {
             task.done = checkbox.checked;
             saveTasks();
-            render();
+            render(null, false, task.done ? task.id : null);
           });
 
           const label = document.createElement("label");
@@ -381,16 +440,17 @@
         text,
         done: false
       });
+      const addedTaskId = tasks[tasks.length - 1].id;
       saveTasks();
       input.value = "";
-      render();
+      render(addedTaskId);
       input.focus();
     });
 
     document.getElementById("clear-completed").addEventListener("click", () => {
       tasks = tasks.filter(task => !task.done);
       saveTasks();
-      render();
+      render(null, true);
     });
 
     render();
